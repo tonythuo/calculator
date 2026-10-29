@@ -1,0 +1,16 @@
+/* Styles: fill in the empty rules below (display box, button grid, etc.) */
+#display {}
+
+button {}
+
+#equals {}
+
+#clear {}
+
+#decimal {}
+
+#backspace {}
+
+button[data-number] {}
+
+button[data-operator] {}
