@@ -9,25 +9,25 @@ const calcState = {
 
 // Input (Tony): appendNumber, appendDecimal, backspace,
 // handleKeyboard, setupButtons, handleButtonClick
-function appendNumber(num) {}
-function appendDecimal() {}
-function backspace() {}
-function handleKeyboard(event) {}
-function setupButtons() {}
-function handleButtonClick(event) {}
+function appendNumber(num) { }
+function appendDecimal() { }
+function backspace() { }
+function handleKeyboard(event) { }
+function setupButtons() { }
+function handleButtonClick(event) { }
 
-// Logic: add, subtract, multiply, divide, operate,
+// Logic (Lefa): add, subtract, multiply, divide, operate,
 // chooseOperator, calculate, clearCalculator
-function add(a, b) {}
-function subtract(a, b) {}
-function multiply(a, b) {}
-function divide(a, b) {}
-function operate(op, a, b) {}
-function chooseOperator(op) {}
-function calculate() {}
-function clearCalculator() {}
+function add(a, b) { }
+function subtract(a, b) { }
+function multiply(a, b) { }
+function divide(a, b) { }
+function operate(op, a, b) { }
+function chooseOperator(op) { }
+function calculate() { }
+function clearCalculator() { }
 
 // Output (Karim): updateDisplay, showError, roundResult
-function updateDisplay(value) {}
-function showError(message) {}
-function roundResult(number) {}
+function updateDisplay(value) { }
+function showError(message) { }
+function roundResult(number) { }
