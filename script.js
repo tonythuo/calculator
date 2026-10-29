@@ -7,14 +7,90 @@ const calcState = {
   shouldResetDisplay: false
 };
 
-// Input (Tony): appendNumber, appendDecimal, backspace,
+// Input (Tony): startFreshEntry, appendNumber, appendDecimal, backspace,
 // handleKeyboard, setupButtons, handleButtonClick
-function appendNumber(num) { }
-function appendDecimal() { }
-function backspace() { }
-function handleKeyboard(event) { }
-function setupButtons() { }
-function handleButtonClick(event) { }
+function startFreshEntry(value) {
+  calcState.displayValue = value;
+  calcState.shouldResetDisplay = false;
+}
+
+function appendNumber(num) {
+  if (calcState.shouldResetDisplay || calcState.displayValue === "0") {
+    startFreshEntry(num);
+  } else {
+    calcState.displayValue += num;
+  }
+  updateDisplay(calcState.displayValue);
+}
+
+function appendDecimal() {
+  if (calcState.shouldResetDisplay) {
+    startFreshEntry("0.");
+  } else if (!calcState.displayValue.includes(".")) {
+    calcState.displayValue += ".";
+  } else {
+    return;
+  }
+  updateDisplay(calcState.displayValue);
+}
+
+function backspace() {
+  if (calcState.shouldResetDisplay) {
+    startFreshEntry("0");
+  } else {
+    calcState.displayValue = calcState.displayValue.slice(0, -1);
+    if (calcState.displayValue === "") calcState.displayValue = "0";
+  }
+  updateDisplay(calcState.displayValue);
+}
+
+function handleKeyboard(event) {
+  const key = event.key;
+  if (key >= "0" && key <= "9") {
+    appendNumber(key);
+  } else if (["+", "-", "*", "/"].includes(key)) {
+    chooseOperator(key);
+  } else if (key === "Enter" || key === "=") {
+    calculate();
+  } else if (key === "Escape") {
+    clearCalculator();
+  } else if (key === "Backspace") {
+    backspace();
+  } else if (key === ".") {
+    appendDecimal();
+  } else {
+    return;
+  }
+  event.preventDefault();
+}
+
+function setupButtons() {
+  document.querySelectorAll(".buttons button").forEach((button) => {
+    button.addEventListener("click", handleButtonClick);
+  });
+  document.addEventListener("keydown", handleKeyboard);
+}
+
+function handleButtonClick(event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  if (button.dataset.number !== undefined) {
+    appendNumber(button.dataset.number);
+  } else if (button.dataset.operator !== undefined) {
+    chooseOperator(button.dataset.operator);
+  } else if (button.id === "equals") {
+    calculate();
+  } else if (button.id === "clear") {
+    clearCalculator();
+  } else if (button.id === "decimal") {
+    appendDecimal();
+  } else if (button.id === "backspace") {
+    backspace();
+  }
+}
+
+setupButtons();
 
 // Logic (Lefa): add, subtract, multiply, divide, operate,
 // chooseOperator, calculate, clearCalculator
