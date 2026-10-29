@@ -7,13 +7,32 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Tony (Structure & Input):
-       display div (id="display", starts "0"),
-       digit buttons data-number="0".."9",
-       operator buttons data-operator="+"|"-"|"*"|"/",
-       equals (id="equals"), clear (id="clear"),
-       decimal (id="decimal"), backspace (id="backspace")
-  -->
+  <div id="display" aria-live="polite">0</div>
+
+  <div class="buttons">
+    <button type="button" id="clear" class="span-2">C</button>
+    <button type="button" id="backspace">⌫</button>
+    <button type="button" data-operator="/">/</button>
+
+    <button type="button" data-operator="*">*</button>
+    <button type="button" data-number="7">7</button>
+    <button type="button" data-number="8">8</button>
+    <button type="button" data-number="9">9</button>
+
+    <button type="button" data-number="4">4</button>
+    <button type="button" data-number="5">5</button>
+    <button type="button" data-number="6">6</button>
+    <button type="button" data-operator="-">-</button>
+
+    <button type="button" data-number="1">1</button>
+    <button type="button" data-number="2">2</button>
+    <button type="button" data-number="3">3</button>
+    <button type="button" data-operator="+">+</button>
+
+    <button type="button" data-number="0" class="span-2">0</button>
+    <button type="button" id="decimal">.</button>
+    <button type="button" id="equals">=</button>
+  </div>
 
   <script src="script.js" defer></script>
 </body>
