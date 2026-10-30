@@ -94,14 +94,93 @@ setupButtons();
 
 // Logic (Lefa): add, subtract, multiply, divide, operate,
 // chooseOperator, calculate, clearCalculator
-function add(a, b) { }
-function subtract(a, b) { }
-function multiply(a, b) { }
-function divide(a, b) { }
-function operate(op, a, b) { }
-function chooseOperator(op) { }
-function calculate() { }
-function clearCalculator() { }
+
+function add(a, b) {
+  return a + b;
+}
+
+function subtract(a, b) {
+  return a - b;
+}
+
+function multiply(a, b) {
+  return a * b;
+}
+
+function divide(a, b) {
+  if (b === 0) {
+    throw new Error("Cannot divide by zero");
+  }
+  return a / b;
+}
+
+function operate(op, a, b) {
+  switch (op) {
+    case "+": return add(a, b);
+    case "-": return subtract(a, b);
+    case "*": return multiply(a, b);
+    case "/": return divide(a, b);
+    default: return b;
+  }
+}
+
+function chooseOperator(op) {
+  // 1. If there's a pending operation, evaluate it first (chained ops)
+  if (
+    calcState.firstNumber !== null &&
+    calcState.currentOperator !== null &&
+    !calcState.waitingForSecondNumber
+  ) {
+    const result = calculate();
+    calcState.firstNumber = result;
+    updateDisplay(result); // Show the intermediate result (e.g., 12 + 7 = 19)
+  } else {
+    calcState.firstNumber = parseFloat(calcState.displayValue);
+  }
+
+  // 2. Store the new operator and wait for the second number
+  calcState.currentOperator = op;
+  calcState.waitingForSecondNumber = true;
+  calcState.shouldResetDisplay = true;
+}
+
+function calculate() {
+  // Guard: Nothing to calculate if we don't have an operator
+  if (calcState.firstNumber === null || calcState.currentOperator === null) {
+    return parseFloat(calcState.displayValue);
+  }
+
+  const secondNumber = parseFloat(calcState.displayValue);
+  
+  let result;
+  try {
+    result = operate(calcState.currentOperator, calcState.firstNumber, secondNumber);
+    result = roundResult(result); // Round to prevent overflow
+  } catch (error) {
+    // Pass the error to Karim's showError function
+    showError(error.message);
+    return null; 
+  }
+
+  // Update state for potential chained operations
+  calcState.firstNumber = result;
+  calcState.currentOperator = null;
+  calcState.waitingForSecondNumber = false;
+  calcState.shouldResetDisplay = true;
+
+  updateDisplay(result);
+  return result;
+}
+
+function clearCalculator() {
+  calcState.firstNumber = null;
+  calcState.currentOperator = null;
+  calcState.displayValue = "0";
+  calcState.waitingForSecondNumber = false;
+  calcState.shouldResetDisplay = false;
+  
+  updateDisplay("0");
+}
 
 // Output (Karim): updateDisplay, showError, roundResult
 function updateDisplay(value) { }
