@@ -45,7 +45,7 @@ function backspace() {
 }
 
 function handleKeyboard(event) {
-  if (event.ctrlKey || event.metaKey || event.altKey) return; // leave browser shortcuts (zoom, etc.) alone
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
   const key = event.key;
   if (key >= "0" && key <= "9") {
     appendNumber(key);
@@ -126,50 +126,45 @@ function operate(op, a, b) {
 }
 
 function chooseOperator(op) {
-  // 1. If there's a pending operation, evaluate it first (chained ops)
   if (
     calcState.firstNumber !== null &&
     calcState.currentOperator !== null &&
-    !calcState.shouldResetDisplay // a second number was entered since the operator
+    !calcState.shouldResetDisplay
   ) {
     const result = calculate();
-    if (result === null) return; // error path already showed it and reset state
+    if (result === null) return;
     calcState.firstNumber = result;
-    updateDisplay(result); // Show the intermediate result (e.g., 12 + 7 = 19)
+    updateDisplay(result);
   } else {
     calcState.firstNumber = parseFloat(calcState.displayValue);
   }
 
-  // 2. Store the new operator and wait for the second number
   calcState.currentOperator = op;
   calcState.waitingForSecondNumber = true;
   calcState.shouldResetDisplay = true;
 }
 
 function calculate() {
-  // Guard: Nothing to calculate if we don't have an operator
   if (calcState.firstNumber === null || calcState.currentOperator === null) {
     return parseFloat(calcState.displayValue);
   }
 
   const secondNumber = parseFloat(calcState.displayValue);
-  
+
   let result;
   try {
     result = operate(calcState.currentOperator, calcState.firstNumber, secondNumber);
-    result = roundResult(result); // shorten decimals so long results fit the display
+    result = roundResult(result);
   } catch (error) {
-    // Pass the error to Karim's showError, then drop the pending operation
     showError(error.message);
     calcState.currentOperator = null;
     calcState.waitingForSecondNumber = false;
-    calcState.shouldResetDisplay = true; // next digit starts fresh, clearing the error
+    calcState.shouldResetDisplay = true;
     return null;
   }
 
-  // Update state for potential chained operations
   calcState.firstNumber = result;
-  calcState.displayValue = String(result); // keep state in sync with what's on screen
+  calcState.displayValue = String(result);
   calcState.currentOperator = null;
   calcState.waitingForSecondNumber = false;
   calcState.shouldResetDisplay = true;
@@ -184,7 +179,7 @@ function clearCalculator() {
   calcState.displayValue = "0";
   calcState.waitingForSecondNumber = false;
   calcState.shouldResetDisplay = false;
-  
+
   updateDisplay("0");
 }
 
@@ -192,20 +187,18 @@ function clearCalculator() {
 const displayEl = document.getElementById("display");
 
 function updateDisplay(value) {
-  displayEl.textContent = String(value); // handles both number and string input
+  displayEl.textContent = String(value);
   displayEl.classList.remove("error");
 }
 
 function showError(message) {
-  // Display-only: never touch calcState — calculate()'s error path owns error recovery
   updateDisplay(message);
   displayEl.classList.add("error");
 }
 
 function roundResult(number) {
-  // Past ~1e13, x*100 loses precision and fabricates digits — pass big numbers through
   if (Math.abs(number) < 1e13) {
-    return Math.round(number * 100) / 100; // 2 decimals keeps long results short
+    return Math.round(number * 100) / 100;
   }
   return number;
 }

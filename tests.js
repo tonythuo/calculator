@@ -172,5 +172,5 @@
 
   console.log(`\n✅ ${passed} passed, ❌ ${failed} failed`);
   globalThis.__TESTS__ = { passed, failed };
-  reset(); // leave the calculator clean
+  reset();
 })();
