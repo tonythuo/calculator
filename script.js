@@ -1,3 +1,4 @@
+// Shared state (Interface Contract — defined here once, all branches use it)
 /**
  * Shared calculator state, defined once and used by every layer.
  *
@@ -14,6 +15,9 @@ const calcState = {
   waitingForSecondNumber: false,
   shouldResetDisplay: false
 };
+
+// Input (Tony): startFreshEntry, appendNumber, appendDecimal, backspace,
+// handleKeyboard, setupButtons, handleButtonClick
 
 /**
  * Replaces the display value and clears the reset flag so typing continues from it.
@@ -131,6 +135,9 @@ function handleButtonClick(event) {
 }
 
 setupButtons();
+
+// Logic (Lefa): add, subtract, multiply, divide, operate,
+// chooseOperator, calculate, clearCalculator
 
 /**
  * Adds two numbers.
@@ -266,6 +273,7 @@ function clearCalculator() {
   updateDisplay("0");
 }
 
+// Output (Karim): updateDisplay, showError, roundResult
 const displayEl = document.getElementById("display");
 
 /**
