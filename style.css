@@ -1,16 +1,83 @@
-/* Styles: fill in the empty rules below (display box, button grid, etc.) */
-#display {}
+/* Calculator styles: dark theme, 4-column button grid */
 
-button {}
+* {
+  box-sizing: border-box;
+}
 
-#equals {}
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #1b1d28;
+  font-family: system-ui, sans-serif;
+}
 
-#clear {}
+#display {
+  width: 340px;
+  min-height: 74px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #262a3b;
+  color: #f4f5fb;
+  font-size: 2.4rem;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-#decimal {}
+#display.error {
+  color: #ff7a7a;
+  font-size: 1.3rem;
+  text-align: center;
+  white-space: normal;
+}
 
-#backspace {}
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 340px;
+}
 
-button[data-number] {}
+button {
+  padding: 18px 0;
+  border: none;
+  border-radius: 12px;
+  background: #343951;
+  color: #f4f5fb;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-button[data-operator] {}
+button:hover {
+  filter: brightness(1.2);
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+#equals {
+  background: #4c7ef3;
+}
+
+#clear {
+  background: #e5484d;
+}
+
+button[data-operator],
+#decimal,
+#backspace {
+  background: #4a5070;
+}
