@@ -45,6 +45,7 @@ function backspace() {
 }
 
 function handleKeyboard(event) {
+  if (event.ctrlKey || event.metaKey || event.altKey) return; // leave browser shortcuts (zoom, etc.) alone
   const key = event.key;
   if (key >= "0" && key <= "9") {
     appendNumber(key);
@@ -156,7 +157,7 @@ function calculate() {
   let result;
   try {
     result = operate(calcState.currentOperator, calcState.firstNumber, secondNumber);
-    result = roundResult(result); // Round to prevent overflow
+    result = roundResult(result); // shorten decimals so long results fit the display
   } catch (error) {
     // Pass the error to Karim's showError, then drop the pending operation
     showError(error.message);
@@ -168,6 +169,7 @@ function calculate() {
 
   // Update state for potential chained operations
   calcState.firstNumber = result;
+  calcState.displayValue = String(result); // keep state in sync with what's on screen
   calcState.currentOperator = null;
   calcState.waitingForSecondNumber = false;
   calcState.shouldResetDisplay = true;
@@ -195,10 +197,15 @@ function updateDisplay(value) {
 }
 
 function showError(message) {
+  // Display-only: never touch calcState — calculate()'s error path owns error recovery
   updateDisplay(message);
   displayEl.classList.add("error");
 }
 
 function roundResult(number) {
-  return Math.round(number * 100) / 100; // 2 decimals keeps long results short
+  // Past ~1e13, x*100 loses precision and fabricates digits — pass big numbers through
+  if (Math.abs(number) < 1e13) {
+    return Math.round(number * 100) / 100; // 2 decimals keeps long results short
+  }
+  return number;
 }

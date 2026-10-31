@@ -59,6 +59,8 @@
   assert("roundResult(3.14159)", roundResult(3.14159), 3.14);
   assert("roundResult(2)", roundResult(2), 2);
   assert("roundResult(1/3)", roundResult(1 / 3), 0.33);
+  assert("roundResult(1e21) unchanged", roundResult(1e21), 1e21);
+  assert("roundResult(Infinity) stays Infinity", roundResult(Infinity), Infinity);
 
   reset();
   showError("boom");
@@ -107,6 +109,19 @@
   appendNumber("5");
   assert("chained result 12 + 7 - 5 = 14", calculate(), 14);
 
+  // --- Equals then continue (12 + 7 = 19, then + 3 = 22) ---
+  reset();
+  appendNumber("1");
+  appendNumber("2");
+  chooseOperator("+");
+  appendNumber("7");
+  calculate();
+  assert("equals shows intermediate", displayText(), "19");
+  chooseOperator("+");
+  appendNumber("3");
+  assert("continue after equals 22", calculate(), 22);
+  assert("continue after equals display", displayText(), "22");
+
   // --- Operator pressed twice in a row ---
   reset();
   appendNumber("1");
@@ -149,6 +164,11 @@
   assert("keyboard operator", calcState.currentOperator, "+");
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
   assert("keyboard clear", calcState.displayValue, "0");
+
+  reset();
+  appendNumber("5");
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "0", ctrlKey: true }));
+  assert("ctrl+digit left for the browser", calcState.displayValue, "5");
 
   console.log(`\n✅ ${passed} passed, ❌ ${failed} failed`);
   globalThis.__TESTS__ = { passed, failed };
