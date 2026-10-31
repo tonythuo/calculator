@@ -129,9 +129,10 @@ function chooseOperator(op) {
   if (
     calcState.firstNumber !== null &&
     calcState.currentOperator !== null &&
-    !calcState.waitingForSecondNumber
+    !calcState.shouldResetDisplay // a second number was entered since the operator
   ) {
     const result = calculate();
+    if (result === null) return; // error path already showed it and reset state
     calcState.firstNumber = result;
     updateDisplay(result); // Show the intermediate result (e.g., 12 + 7 = 19)
   } else {
@@ -157,9 +158,12 @@ function calculate() {
     result = operate(calcState.currentOperator, calcState.firstNumber, secondNumber);
     result = roundResult(result); // Round to prevent overflow
   } catch (error) {
-    // Pass the error to Karim's showError function
+    // Pass the error to Karim's showError, then drop the pending operation
     showError(error.message);
-    return null; 
+    calcState.currentOperator = null;
+    calcState.waitingForSecondNumber = false;
+    calcState.shouldResetDisplay = true; // next digit starts fresh, clearing the error
+    return null;
   }
 
   // Update state for potential chained operations
@@ -183,6 +187,18 @@ function clearCalculator() {
 }
 
 // Output (Karim): updateDisplay, showError, roundResult
-function updateDisplay(value) { }
-function showError(message) { }
-function roundResult(number) { }
+const displayEl = document.getElementById("display");
+
+function updateDisplay(value) {
+  displayEl.textContent = String(value); // handles both number and string input
+  displayEl.classList.remove("error");
+}
+
+function showError(message) {
+  updateDisplay(message);
+  displayEl.classList.add("error");
+}
+
+function roundResult(number) {
+  return Math.round(number * 100) / 100; // 2 decimals keeps long results short
+}
