@@ -1,4 +1,12 @@
-// Shared state (Interface Contract — defined here once, all branches use it)
+/**
+ * Shared calculator state, defined once and used by every layer.
+ *
+ * @property {number|null} firstNumber - Left operand of the pending operation.
+ * @property {string|null} currentOperator - Pending operator: "+", "-", "*", "/".
+ * @property {string} displayValue - Digits currently shown on screen.
+ * @property {boolean} waitingForSecondNumber - True after an operator is chosen.
+ * @property {boolean} shouldResetDisplay - True when the next digit replaces the display.
+ */
 const calcState = {
   firstNumber: null,
   currentOperator: null,
@@ -7,13 +15,21 @@ const calcState = {
   shouldResetDisplay: false
 };
 
-// Input (Tony): startFreshEntry, appendNumber, appendDecimal, backspace,
-// handleKeyboard, setupButtons, handleButtonClick
+/**
+ * Replaces the display value and clears the reset flag so typing continues from it.
+ * @param {string} value - New display value.
+ * @returns {void}
+ */
 function startFreshEntry(value) {
   calcState.displayValue = value;
   calcState.shouldResetDisplay = false;
 }
 
+/**
+ * Appends a single digit to the current display value.
+ * @param {string} num - One digit, "0" through "9".
+ * @returns {void}
+ */
 function appendNumber(num) {
   if (calcState.shouldResetDisplay || calcState.displayValue === "0") {
     startFreshEntry(num);
@@ -23,6 +39,10 @@ function appendNumber(num) {
   updateDisplay(calcState.displayValue);
 }
 
+/**
+ * Adds a decimal point to the display, unless one already exists there.
+ * @returns {void}
+ */
 function appendDecimal() {
   if (calcState.shouldResetDisplay) {
     startFreshEntry("0.");
@@ -34,6 +54,10 @@ function appendDecimal() {
   updateDisplay(calcState.displayValue);
 }
 
+/**
+ * Removes the last character from the display, falling back to "0" when empty.
+ * @returns {void}
+ */
 function backspace() {
   if (calcState.shouldResetDisplay) {
     startFreshEntry("0");
@@ -44,8 +68,13 @@ function backspace() {
   updateDisplay(calcState.displayValue);
 }
 
+/**
+ * Routes keypresses to the same functions the buttons use.
+ * @param {KeyboardEvent} event
+ * @returns {void}
+ */
 function handleKeyboard(event) {
-  if (event.ctrlKey || event.metaKey || event.altKey) return; // leave browser shortcuts (zoom, etc.) alone
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
   const key = event.key;
   if (key >= "0" && key <= "9") {
     appendNumber(key);
@@ -65,6 +94,10 @@ function handleKeyboard(event) {
   event.preventDefault();
 }
 
+/**
+ * Attaches click listeners to every calculator button and the keyboard handler.
+ * @returns {void}
+ */
 function setupButtons() {
   document.querySelectorAll(".buttons button").forEach((button) => {
     button.addEventListener("click", handleButtonClick);
@@ -72,6 +105,12 @@ function setupButtons() {
   document.addEventListener("keydown", handleKeyboard);
 }
 
+/**
+ * Dispatches a button click to the function matching its data-number,
+ * data-operator, or id attribute.
+ * @param {MouseEvent} event
+ * @returns {void}
+ */
 function handleButtonClick(event) {
   const button = event.target.closest("button");
   if (!button) return;
@@ -93,21 +132,43 @@ function handleButtonClick(event) {
 
 setupButtons();
 
-// Logic (Lefa): add, subtract, multiply, divide, operate,
-// chooseOperator, calculate, clearCalculator
-
+/**
+ * Adds two numbers.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} a + b
+ */
 function add(a, b) {
   return a + b;
 }
 
+/**
+ * Subtracts b from a.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} a - b
+ */
 function subtract(a, b) {
   return a - b;
 }
 
+/**
+ * Multiplies two numbers.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} a * b
+ */
 function multiply(a, b) {
   return a * b;
 }
 
+/**
+ * Divides a by b.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} a / b
+ * @throws {Error} "Cannot divide by zero" when b is 0.
+ */
 function divide(a, b) {
   if (b === 0) {
     throw new Error("Cannot divide by zero");
@@ -115,6 +176,13 @@ function divide(a, b) {
   return a / b;
 }
 
+/**
+ * Runs the math function matching the operator string.
+ * @param {string} op - One of "+", "-", "*", "/"; anything else returns b unchanged.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} The operation's result.
+ */
 function operate(op, a, b) {
   switch (op) {
     case "+": return add(a, b);
@@ -125,51 +193,57 @@ function operate(op, a, b) {
   }
 }
 
+/**
+ * Stores the chosen operator, first evaluating any pending operation
+ * so chains like 12 + 7 - 5 work.
+ * @param {string} op - One of "+", "-", "*", "/".
+ * @returns {void}
+ */
 function chooseOperator(op) {
-  // 1. If there's a pending operation, evaluate it first (chained ops)
   if (
     calcState.firstNumber !== null &&
     calcState.currentOperator !== null &&
-    !calcState.shouldResetDisplay // a second number was entered since the operator
+    !calcState.shouldResetDisplay
   ) {
     const result = calculate();
-    if (result === null) return; // error path already showed it and reset state
+    if (result === null) return;
     calcState.firstNumber = result;
-    updateDisplay(result); // Show the intermediate result (e.g., 12 + 7 = 19)
+    updateDisplay(result);
   } else {
     calcState.firstNumber = parseFloat(calcState.displayValue);
   }
 
-  // 2. Store the new operator and wait for the second number
   calcState.currentOperator = op;
   calcState.waitingForSecondNumber = true;
   calcState.shouldResetDisplay = true;
 }
 
+/**
+ * Computes the pending operation from calcState and displays the result,
+ * leaving state ready for chained operations.
+ * @returns {number|null} The rounded result, or null when the operation failed.
+ */
 function calculate() {
-  // Guard: Nothing to calculate if we don't have an operator
   if (calcState.firstNumber === null || calcState.currentOperator === null) {
     return parseFloat(calcState.displayValue);
   }
 
   const secondNumber = parseFloat(calcState.displayValue);
-  
+
   let result;
   try {
     result = operate(calcState.currentOperator, calcState.firstNumber, secondNumber);
-    result = roundResult(result); // shorten decimals so long results fit the display
+    result = roundResult(result);
   } catch (error) {
-    // Pass the error to Karim's showError, then drop the pending operation
     showError(error.message);
     calcState.currentOperator = null;
     calcState.waitingForSecondNumber = false;
-    calcState.shouldResetDisplay = true; // next digit starts fresh, clearing the error
+    calcState.shouldResetDisplay = true;
     return null;
   }
 
-  // Update state for potential chained operations
   calcState.firstNumber = result;
-  calcState.displayValue = String(result); // keep state in sync with what's on screen
+  calcState.displayValue = String(result);
   calcState.currentOperator = null;
   calcState.waitingForSecondNumber = false;
   calcState.shouldResetDisplay = true;
@@ -178,34 +252,51 @@ function calculate() {
   return result;
 }
 
+/**
+ * Resets calcState and the display to their starting values.
+ * @returns {void}
+ */
 function clearCalculator() {
   calcState.firstNumber = null;
   calcState.currentOperator = null;
   calcState.displayValue = "0";
   calcState.waitingForSecondNumber = false;
   calcState.shouldResetDisplay = false;
-  
+
   updateDisplay("0");
 }
 
-// Output (Karim): updateDisplay, showError, roundResult
 const displayEl = document.getElementById("display");
 
+/**
+ * Shows a value on the display and clears any error styling.
+ * @param {number|string} value - What the display should show.
+ * @returns {void}
+ */
 function updateDisplay(value) {
-  displayEl.textContent = String(value); // handles both number and string input
+  displayEl.textContent = String(value);
   displayEl.classList.remove("error");
 }
 
+/**
+ * Shows an error message on the display in the error style.
+ * @param {string} message
+ * @returns {void}
+ */
 function showError(message) {
-  // Display-only: never touch calcState — calculate()'s error path owns error recovery
   updateDisplay(message);
   displayEl.classList.add("error");
 }
 
+/**
+ * Rounds a number to 2 decimal places; values at 1e13 and above are returned
+ * unchanged because x * 100 loses precision there.
+ * @param {number} number
+ * @returns {number}
+ */
 function roundResult(number) {
-  // Past ~1e13, x*100 loses precision and fabricates digits — pass big numbers through
   if (Math.abs(number) < 1e13) {
-    return Math.round(number * 100) / 100; // 2 decimals keeps long results short
+    return Math.round(number * 100) / 100;
   }
   return number;
 }
