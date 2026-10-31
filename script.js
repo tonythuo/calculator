@@ -1,4 +1,3 @@
-// Shared state (Interface Contract — defined here once, all branches use it)
 const calcState = {
   firstNumber: null,
   currentOperator: null,
@@ -7,8 +6,6 @@ const calcState = {
   shouldResetDisplay: false
 };
 
-// Input (Tony): startFreshEntry, appendNumber, appendDecimal, backspace,
-// handleKeyboard, setupButtons, handleButtonClick
 function startFreshEntry(value) {
   calcState.displayValue = value;
   calcState.shouldResetDisplay = false;
@@ -92,9 +89,6 @@ function handleButtonClick(event) {
 }
 
 setupButtons();
-
-// Logic (Lefa): add, subtract, multiply, divide, operate,
-// chooseOperator, calculate, clearCalculator
 
 function add(a, b) {
   return a + b;
@@ -183,7 +177,6 @@ function clearCalculator() {
   updateDisplay("0");
 }
 
-// Output (Karim): updateDisplay, showError, roundResult
 const displayEl = document.getElementById("display");
 
 function updateDisplay(value) {
