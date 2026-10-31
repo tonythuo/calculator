@@ -13,8 +13,6 @@ Open `index.html` in any browser.
 | `index.html` | Display, buttons, page structure |
 | `style.css` | Display box and button grid styling |
 | `script.js` | Shared state, input handling, logic, and output functions |
-| `tests.js` | Console test suite — auto-runs on load, results in DevTools console |
-| `AGENTS.md` | Project schedule, team roles, and interface contract |
 
 ## How it's split (One Function, One Job)
 
@@ -31,5 +29,3 @@ Open `index.html` in any browser.
 - Clear and backspace
 - Keyboard support
 - Long decimals rounded
-
-See [AGENTS.md](AGENTS.md) for the full schedule, roles, and function contract.
